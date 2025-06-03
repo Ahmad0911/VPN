@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure VPN Controller</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --text-color: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-color);
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            width: 100%;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            font-size: 2.2rem;
+            margin-right: 15px;
+        }
+        
+        h1 {
+            font-weight: 600;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-header h2 i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .status-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .status-text {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-connected .status-indicator {
+            background-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.2);
+        }
+        
+        .status-connecting .status-indicator {
+            background-color: var(--warning-color);
+            box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.2);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-disconnected .status-indicator {
+            background-color: var(--danger-color);
+            box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.2);
+        }
+        
+        .status-error .status-indicator {
+            background-color: var(--danger-color);
+            box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.2);
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .status-details {
+            background-color: rgba(236, 240, 241, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .detail-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-connect {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-connect:hover:not(:disabled) {
+            background-color: #27ae60;
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-disconnect {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-disconnect:hover:not(:disabled) {
+            background-color: #c0392b;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+        
+        .log-container {
+            position: relative;
+        }
+        
+        .log-header {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 1;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .log-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .log-title i {
+            margin-right: 8px;
+            color: var(--secondary-color);
+        }
+        
+        .log-area {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 6px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        
+        .log-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .log-area::-webkit-scrollbar-track {
+            background: #34495e;
+        }
+        
+        .log-area::-webkit-scrollbar-thumb {
+            background-color: #7f8c8d;
+            border-radius: 10px;
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash-message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #2980b9;
+            border-left: 4px solid #3498db;
+            display: flex;
+            align-items: center;
+        }
+        
+        .flash-message i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px 0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        /* Animation for new logs */
+        @keyframes highlight {
+            from { background-color: rgba(52, 152, 219, 0.3); }
+            to { background-color: transparent; }
+        }
+        
+        .new-log {
+            animation: highlight 2s ease-out;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .status-details {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-bottom: 10px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Hikmah VPN</h1>
+            </div>
+            <div id="current-time"></div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Status Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Connection Status</h2>
+                <div id="refresh-status"><i class="fas fa-sync-alt"></i></div>
+            </div>
+            <div class="card-body">
+                <div class="status-display">
+                    <div id="status-text" class="status-text status-disconnected">
+                        <span class="status-indicator"></span>
+                        <span id="status-label">{{ status }}</span>
+                    </div>
+                    <div>
+                        <span id="uptime">--:--:--</span>
+                    </div>
+                </div>
+                
+                <div class="status-details">
+                    <div class="detail-item">
+                        <div class="detail-label">CONNECTION</div>
+                        <div class="detail-value" id="connection-type">OpenVPN</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">PUBLIC IP</div>
+                        <div class="detail-value" id="public-ip">---.---.---.---</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">LOCATION</div>
+                        <div class="detail-value" id="location">Unknown</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Connection Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-plug"></i> VPN Connection</h2>
+            </div>
+            <div class="card-body">
+                <!-- Flash Messages -->
+                <div class="flash-messages">
+                    {% for message in get_flashed_messages() %}
+                        <div class="flash-message">
+                            <i class="fas fa-info-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <form id="connect-form" action="/connect" method="post">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" name="username" placeholder="Enter your VPN username">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" placeholder="Enter your VPN password">
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button type="submit" id="connect-btn" class="btn-connect" {% if status == 'Connected' or status == 'Connecting...' %}disabled{% endif %}>
+                            <i class="fas fa-play-circle"></i> Connect
+                        </button>
+                        <button type="button" id="disconnect-btn" class="btn-disconnect" onclick="disconnectVPN()" {% if status == 'Disconnected' %}disabled{% endif %}>
+                            <i class="fas fa-stop-circle"></i> Disconnect
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Logs Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-terminal"></i> Connection Logs</h2>
+                <button id="clear-logs" style="background: none; padding: 5px;" title="Clear logs">
+                    <i class="fas fa-trash-alt" style="color: #95a5a6;"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="log-container">
+                    <div id="log-area" class="log-area">
+                    {% for line in logs %}
+                        {{ line }}
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Secure VPN Controller &copy; 2025</p>
+    </footer>
+    
+    <!-- Hidden disconnect form -->
+    <form id="disconnect-form" action="/disconnect" method="post" style="display: none;"></form>
+    
+    <script>
+        // Connection start time for uptime calculation
+        let connectionStartTime = null;
+        let isConnected = {{ 'true' if status == 'Connected' else 'false' }};
+        
+        // Function to update the current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            };
+            document.getElementById('current-time').textContent = now.toLocaleString(undefined, options);
+        }
+        
+        // Update uptime if connected
+        function updateUptime() {
+            if (connectionStartTime && isConnected) {
+                const now = new Date();
+                const diff = Math.floor((now - connectionStartTime) / 1000);
+                
+                const hours = Math.floor(diff / 3600).toString().padStart(2, '0');
+                const minutes = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+                const seconds = Math.floor(diff % 60).toString().padStart(2, '0');
+                
+                document.getElementById('uptime').textContent = `${hours}:${minutes}:${seconds}`;
+            } else {
+                document.getElementById('uptime').textContent = "--:--:--";
+            }
+        }
+        
+        // Animation for refresh icon
+        document.getElementById('refresh-status').addEventListener('click', function() {
+            this.classList.add('fa-spin');
+            setTimeout(() => {
+                this.classList.remove('fa-spin');
+                updateStatus(true);
+            }, 500);
+        });
+        
+        // Clear logs
+        document.getElementById('clear-logs').addEventListener('click', function() {
+            document.getElementById('log-area').textContent = '';
+        });
+        
+        // Function to disconnect VPN
+        function disconnectVPN() {
+            document.getElementById('disconnect-form').submit();
+        }
+        
+        // Function to update status and logs
+        function updateStatus(forceRefresh = false) {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    // Update status
+                    const statusText = document.getElementById('status-text');
+                    const statusLabel = document.getElementById('status-label');
+                    statusLabel.textContent = data.status;
+                    
+                    // Update status classes
+                    statusText.className = 'status-text';
+                    if (data.status === 'Connected') {
+                        statusText.classList.add('status-connected');
+                        document.getElementById('connection-type').textContent = 'OpenVPN (Secure)';
+                        
+                        // If we just got connected, set the connection start time
+                        if (!isConnected) {
+                            connectionStartTime = new Date();
+                            isConnected = true;
+                            
+                            // Simulate getting a public IP (in a real app, you would get this from an API)
+                            setTimeout(() => {
+                                document.getElementById('public-ip').textContent = '192.168.1.xxx';
+                                document.getElementById('location').textContent = 'Secure Server';
+                            }, 1000);
+                        }
+                    } else if (data.status === 'Connecting...') {
+                        statusText.classList.add('status-connecting');
+                        document.getElementById('connection-type').textContent = 'OpenVPN (Connecting)';
+                    } else if (data.status === 'Error') {
+                        statusText.classList.add('status-error');
+                        document.getElementById('connection-type').textContent = 'Error';
+                        isConnected = false;
+                    } else {
+                        statusText.classList.add('status-disconnected');
+                        document.getElementById('connection-type').textContent = 'Disconnected';
+                        document.getElementById('public-ip').textContent = '---.---.---.---';
+                        document.getElementById('location').textContent = 'Unknown';
+                        isConnected = false;
+                    }
+                    
+                    // Update connect/disconnect buttons
+                    const connectBtn = document.getElementById('connect-btn');
+                    const disconnectBtn = document.getElementById('disconnect-btn');
+                    
+                    if (data.status === 'Connected' || data.status === 'Connecting...') {
+                        connectBtn.disabled = true;
+                        disconnectBtn.disabled = false;
+                    } else {
+                        connectBtn.disabled = false;
+                        disconnectBtn.disabled = true;
+                    }
+                    
+                    // Update logs
+                    const logArea = document.getElementById('log-area');
+                    if (data.logs && data.logs.length > 0) {
+                        // Only add new logs if they're different
+                        const currentLogs = logArea.textContent.trim();
+                        const newLogs = data.logs.join('\n');
+                        
+                        if (!currentLogs.endsWith(newLogs) || forceRefresh) {
+                            // Create a span for the new logs with highlight animation
+                            const newLogSpan = document.createElement('div');
+                            newLogSpan.className = 'new-log';
+                            newLogSpan.textContent = newLogs;
+                            
+                            // Clear the log area and add the new content
+                            if (forceRefresh) {
+                                logArea.innerHTML = '';
+                            }
+                            
+                            logArea.appendChild(newLogSpan);
+                            
+                            // Scroll to bottom
+                            logArea.scrollTop = logArea.scrollHeight;
+                        }
+                    }
+                })
+                .catch(error => console.error('Error updating status:', error));
+        }
+        
+        // Update time and status on page load
+        updateCurrentTime();
+        updateStatus(true);
+        
+        // Set intervals for updates
+        setInterval(updateCurrentTime, 1000);
+        setInterval(updateUptime, 1000);
+        setInterval(updateStatus, 2000);
+    </script>
+</body>
+</html>
